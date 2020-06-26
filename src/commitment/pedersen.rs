@@ -5,7 +5,7 @@ use std::fmt::Debug;
 pub mod mult;
 
 pub type CommitterMult = mult::Committer;
-pub type CommMult = mult::Comm;
+pub type CommitMult = mult::Commit;
 
 /// A Pedersen Committer is represented here.
 ///
@@ -16,7 +16,7 @@ pub struct Committer<E: Element, G: DLogGroup<E>> {
     h: E,
 }
 
-pub type Comm<E> = E;
+pub type Commit<E> = E;
 #[derive(Debug)]
 pub struct Opening<E: Element> {
     msg: E,
@@ -25,9 +25,9 @@ pub struct Opening<E: Element> {
 
 impl<E: Element> super::Opening for Opening<E> {}
 
-impl<E: Element> super::Commit for Comm<E> {}
+impl<E: Element> super::Commit for Commit<E> {}
 
-impl<E, G> super::Committer<E, Comm<E>, Opening<E>> for Committer<E, G>
+impl<E, G> super::Committer<E, Commit<E>, Opening<E>> for Committer<E, G>
 where
     E: Element + super::Message,
     G: DLogGroup<E>,
@@ -37,7 +37,7 @@ where
     /// # Parameters
     ///
     /// * `msg`: The message.
-    fn commit(&mut self, msg: E) -> Result<(Comm<E>, Opening<E>), ErrorStack> {
+    fn commit(&mut self, msg: E) -> Result<(Commit<E>, Opening<E>), ErrorStack> {
         //x1 = g^r mod q
         let r = self.group.generate_random();
         let x1 = self.group.pow(&r);
@@ -48,7 +48,7 @@ where
         Ok((c, o))
     }
 
-    fn verify(&mut self, c: Comm<E>, o: Opening<E>) -> Result<bool, ErrorStack> {
+    fn verify(&mut self, c: Commit<E>, o: Opening<E>) -> Result<bool, ErrorStack> {
         //x1 = g^r mod q
         let r = o.r;
         let x1 = self.group.pow(&r);

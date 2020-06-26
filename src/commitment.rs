@@ -4,9 +4,9 @@ use openssl::error::ErrorStack;
 pub mod elgamal;
 pub mod pedersen;
 
-pub type ElGamalCommMult = elgamal::CommMult;
+pub type ElGamalCommitMult = elgamal::CommitMult;
 pub type ElGamalCommitterMult = elgamal::CommitterMult;
-pub type PedersenCommMult = pedersen::CommMult;
+pub type PedersenCommitMult = pedersen::CommitMult;
 pub type PedersenCommitterMult = pedersen::CommitterMult;
 
 pub trait Message {}

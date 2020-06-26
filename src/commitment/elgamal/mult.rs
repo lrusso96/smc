@@ -3,7 +3,7 @@ use openssl::bn::BigNum;
 use openssl::error::ErrorStack;
 
 pub type Committer = super::Committer<BigNum, MultGroup>;
-pub type Comm = super::Comm<BigNum>;
+pub type Commit = super::Commit<BigNum>;
 
 impl Committer {
     /// Generates a new instance of El-Gamal Committer.
