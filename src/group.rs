@@ -32,4 +32,4 @@ pub trait DLogGroup<E: Element> {
 }
 
 /// This trait represents an element of a group.
-pub trait Element {}
+pub trait Element: PartialEq {}
