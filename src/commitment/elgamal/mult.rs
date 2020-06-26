@@ -25,8 +25,8 @@ impl Committer {
     ///    println!("{:#?}", commiter);
     ///    let msg = BigNum::from_u32(100).unwrap();
     ///    print!("The commit for {} is: ", msg);
-    ///    let ret = commiter.commit(msg).unwrap();
-    ///    println!("{:#?}", ret);
+    ///    let (c, _) = commiter.commit(msg).unwrap();
+    ///    println!("{:#?}", c);
     ///}
     /// ```
     #[allow(dead_code)]
