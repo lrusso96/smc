@@ -17,21 +17,44 @@ pub struct Committer<E: Element, G: DLogGroup<E>> {
 }
 
 pub type Comm<E> = E;
+#[derive(Debug)]
+pub struct Opening<E: Element> {
+    msg: E,
+    r: E,
+}
 
-impl<E: Element> super::Comm for Comm<E> {}
+impl<E: Element> super::Opening for Opening<E> {}
 
-impl<E: Element + super::Value, G: DLogGroup<E>> super::Committer<Comm<E>, E> for Committer<E, G> {
+impl<E: Element> super::Commit for Comm<E> {}
+
+impl<E, G> super::Committer<E, Comm<E>, Opening<E>> for Committer<E, G>
+where
+    E: Element + super::Message,
+    G: DLogGroup<E>,
+{
     /// Generates a commit c = g^r * h^m, for a given message m.
     ///
     /// # Parameters
     ///
     /// * `msg`: The message.
-    fn commit(&mut self, msg: E) -> Result<Comm<E>, ErrorStack> {
+    fn commit(&mut self, msg: E) -> Result<(Comm<E>, Opening<E>), ErrorStack> {
         //x1 = g^r mod q
         let r = self.group.generate_random();
         let x1 = self.group.pow(&r);
         //x2 = h^m mod q
         let x2 = self.group.exponentiate(&self.h, &msg);
-        Ok(self.group.multiply(&x1, &x2))
+        let c = self.group.multiply(&x1, &x2);
+        let o = Opening { msg, r };
+        Ok((c, o))
+    }
+
+    fn verify(&mut self, c: Comm<E>, o: Opening<E>) -> Result<bool, ErrorStack> {
+        //x1 = g^r mod q
+        let r = o.r;
+        let x1 = self.group.pow(&r);
+        //x2 = h^m mod q
+        let x2 = self.group.exponentiate(&self.h, &o.msg);
+        let cmt = self.group.multiply(&x1, &x2);
+        Ok(cmt == c)
     }
 }
