@@ -9,15 +9,20 @@ pub type ElGamalCommitterMult = elgamal::CommitterMult;
 pub type PedersenCommMult = pedersen::CommMult;
 pub type PedersenCommitterMult = pedersen::CommitterMult;
 
-pub trait Value {}
-pub trait Comm {}
+pub trait Message {}
+pub trait Commit {}
+pub trait Opening {}
 
-//impl Comm for BigNum {}
-impl Value for BigNum {}
+impl Message for BigNum {}
 
-pub trait Committer<C: Comm, V: Value> {
-    fn commit(&mut self, msg: V) -> Result<C, ErrorStack>;
-    //fn decommit(&self) -> (BigNum, BigNum);
+pub trait Committer<M, C, O>
+where
+    M: Message,
+    C: Commit,
+    O: Opening,
+{
+    fn commit(&mut self, msg: M) -> Result<(C, O), ErrorStack>;
+    fn verify(&mut self, c: C, o: O) -> Result<bool, ErrorStack>;
 }
 
 #[cfg(test)]
@@ -34,8 +39,9 @@ mod tests {
         println!("{:#?}", commiter);
         let msg = BigNum::from_u32(100).unwrap();
         print!("The commit for {} is: ", msg);
-        let ret: BigNum = commiter.commit(msg).unwrap();
-        println!("{}", ret);
+        let (c, o) = commiter.commit(msg).unwrap();
+        println!("{}", c);
+        assert_eq!(commiter.verify(c, o).unwrap(), true);
     }
 
     #[test]
@@ -47,7 +53,8 @@ mod tests {
         println!("{:#?}", commiter);
         let msg = BigNum::from_u32(100).unwrap();
         print!("The commit for {} is: ", msg);
-        let ret = commiter.commit(msg).unwrap();
-        println!("{:#?}", ret);
+        let (c, o) = commiter.commit(msg).unwrap();
+        println!("{:#?}", c);
+        assert_eq!(commiter.verify(c, o).unwrap(), true);
     }
 }
