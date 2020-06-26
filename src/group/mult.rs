@@ -3,12 +3,17 @@ use openssl::bn::{BigNum, BigNumContext};
 use openssl::error::ErrorStack;
 use std::fmt;
 
+/// Represents the multiplicative group Zq*, where q is a safe prime.
+///
+/// A safe prime q is such that q = 2p + 1, for a prime p. Note that when q is
+/// a safe prime, the multiplicative group of numbers modulo q has a subgroup
+/// of large prime order.
 pub struct MultGroup {
-    /// a temporary storage for BigNums
+    // a temporary storage for BigNums
     ctx: BigNumContext,
-    /// the generator of the group
+    // the generator of the group
     g: BigNum,
-    /// the order of the group
+    // the order of the group
     q: BigNum,
 }
 
@@ -37,7 +42,7 @@ impl fmt::Debug for MultGroup {
     }
 }
 
-impl super::DDHGroup<BigNum> for MultGroup {
+impl super::DLogGroup<BigNum> for MultGroup {
     fn get_generator(&self) -> &BigNum {
         &self.g
     }

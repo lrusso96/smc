@@ -1,4 +1,4 @@
-use crate::group::{DDHGroup, MultGroup};
+use crate::group::{DLogGroup, MultGroup};
 use openssl::bn::BigNum;
 use openssl::error::ErrorStack;
 

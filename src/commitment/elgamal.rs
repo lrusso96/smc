@@ -1,4 +1,4 @@
-use crate::group::{DDHGroup, Element};
+use crate::group::{DLogGroup, Element};
 use openssl::error::ErrorStack;
 use std::fmt::Debug;
 
@@ -9,7 +9,7 @@ pub type CommMult = mult::Comm;
 
 #[derive(Debug)]
 /// El-Gamal Committer is represented here
-pub struct Committer<E: Element, G: DDHGroup<E>> {
+pub struct Committer<E: Element, G: DLogGroup<E>> {
     group: G,
     h: E,
 }
@@ -22,7 +22,7 @@ pub struct Comm<E: Element> {
 
 impl<E: Element> super::Comm for Comm<E> {}
 
-impl<E: Element + super::Value, G: DDHGroup<E>> super::Committer<Comm<E>, E> for Committer<E, G> {
+impl<E: Element + super::Value, G: DLogGroup<E>> super::Committer<Comm<E>, E> for Committer<E, G> {
     fn commit(&mut self, msg: E) -> Result<Comm<E>, ErrorStack> {
         //c1 = g^r mod q
         let r = self.group.generate_random();
