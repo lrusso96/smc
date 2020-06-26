@@ -23,6 +23,8 @@ pub struct Comm<E: Element> {
 impl<E: Element> super::Comm for Comm<E> {}
 
 impl<E: Element + super::Value, G: DLogGroup<E>> super::Committer<Comm<E>, E> for Committer<E, G> {
+    /// Computes the commit as a tuple (c1, c2), where c1 = g^r and c2 = h^r *
+    /// g^m
     fn commit(&mut self, msg: E) -> Result<Comm<E>, ErrorStack> {
         //c1 = g^r mod q
         let r = self.group.generate_random();

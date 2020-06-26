@@ -7,7 +7,9 @@ pub mod mult;
 pub type CommitterMult = mult::Committer;
 pub type CommMult = mult::Comm;
 
-/// A Pedersen Committer is represented here
+/// A Pedersen Committer is represented here.
+///
+/// More about this scheme on [Non-Interactive and Information-Theoretic Secure Verifiable Secret Sharing](https://link.springer.com/chapter/10.1007/3-540-46766-1_9)
 #[derive(Debug)]
 pub struct Committer<E: Element, G: DLogGroup<E>> {
     group: G,
@@ -19,7 +21,7 @@ pub type Comm<E> = E;
 impl<E: Element> super::Comm for Comm<E> {}
 
 impl<E: Element + super::Value, G: DLogGroup<E>> super::Committer<Comm<E>, E> for Committer<E, G> {
-    /// Generates a commit on a given message.
+    /// Generates a commit c = g^r * h^m, for a given message m.
     ///
     /// # Parameters
     ///
