@@ -3,37 +3,50 @@ use openssl::bn::{BigNum, BigNumContext};
 use openssl::error::ErrorStack;
 use std::fmt;
 
-/// Represents the multiplicative group Zq*, where q is a safe prime.
+/// Represents the multiplicative group Zp*, where p is a safe prime.
 ///
-/// A safe prime q is such that q = 2p + 1, for a prime p. Note that when q is
-/// a safe prime, the multiplicative group of numbers modulo q has a subgroup
+/// A safe prime p is such that p = 2q + 1, for a prime p. Note that when p is
+/// a safe prime, the multiplicative group of numbers modulo p has a subgroup
 /// of large prime order.
-pub struct MultGroup {
+pub struct MultiplicativeGroup {
     // a temporary storage for BigNums
     ctx: BigNumContext,
     // the generator of the group
     g: BigNum,
     // the order of the group
     q: BigNum,
+    // modulus
+    p: BigNum,
 }
 
-impl MultGroup {
+impl MultiplicativeGroup {
     #[allow(dead_code)]
     pub fn new(secpar: i32) -> Result<Self, ErrorStack> {
         // create context to manage the bignum
-        let ctx = BigNumContext::new()?;
-        // generate prime safe number q = 2p + 1
+        let mut ctx = BigNumContext::new()?;
+        // generate prime safe number p = 2q + 1
+        let mut p = BigNum::new()?;
+        p.generate_prime(secpar, true, None, None)?;
+
+        let mut p_minus_one = BigNum::new()?;
+        p_minus_one.checked_sub(&p, &BigNum::from_u32(1).unwrap())?;
         let mut q = BigNum::new()?;
-        q.generate_prime(secpar, true, None, None)?;
+        q.checked_div(&p_minus_one, &BigNum::from_u32(2).unwrap(), &mut ctx)?;
+
+        dbg!(q.is_prime(64, &mut ctx).unwrap());
+        dbg!(p.is_prime(64, &mut ctx).unwrap());
+
         // generate random g (generator)
-        let g = gen_random(&q)?;
-        Ok(Self { ctx, g, q })
+        let _g = gen_random(&p)?;
+        let mut g = BigNum::new()?;
+        g.mod_exp(&_g, &BigNum::from_u32(2).unwrap(), &p, &mut ctx)?;
+        Ok(Self { ctx, g, q, p })
     }
 }
 
 impl super::Element for BigNum {}
 
-impl fmt::Debug for MultGroup {
+impl fmt::Debug for MultiplicativeGroup {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Multiplicative Group")
             .field("g", &self.g)
@@ -42,7 +55,7 @@ impl fmt::Debug for MultGroup {
     }
 }
 
-impl super::DLogGroup<BigNum> for MultGroup {
+impl super::DLogGroup<BigNum> for MultiplicativeGroup {
     fn get_generator(&self) -> &BigNum {
         &self.g
     }
@@ -57,13 +70,13 @@ impl super::DLogGroup<BigNum> for MultGroup {
 
     fn exponentiate(&mut self, e1: &BigNum, e2: &BigNum) -> BigNum {
         let mut ret = BigNum::new().unwrap();
-        ret.mod_exp(&e1, &e2, &self.q, &mut self.ctx).unwrap();
+        ret.mod_exp(&e1, &e2, &self.p, &mut self.ctx).unwrap();
         ret
     }
 
     fn multiply(&mut self, e1: &BigNum, e2: &BigNum) -> BigNum {
         let mut ret = BigNum::new().unwrap();
-        ret.mod_mul(&e1, &e2, &self.q, &mut self.ctx).unwrap();
+        ret.mod_mul(&e1, &e2, &self.p, &mut self.ctx).unwrap();
         ret
     }
 

@@ -1,6 +1,6 @@
 mod mult;
 
-pub use mult::MultGroup;
+pub use mult::MultiplicativeGroup;
 
 /// This is the trait for groups where Discrete Log (**DL**) problem is
 /// considered to be hard.

@@ -37,7 +37,7 @@ mod tests {
         println!("I'm gonna use {} bits security", sec);
         let mut commiter = PedersenCommitterMult::new(sec).unwrap();
         println!("{:#?}", commiter);
-        let msg = BigNum::from_u32(100).unwrap();
+        let msg = BigNum::from_u32(123).unwrap();
         print!("The commit for {} is: ", msg);
         let (c, o) = commiter.commit(msg).unwrap();
         println!("{}", c);
@@ -51,7 +51,7 @@ mod tests {
         println!("I'm gonna use {} bits security", sec);
         let mut commiter = ElGamalCommitterMult::new(sec).unwrap();
         println!("{:#?}", commiter);
-        let msg = BigNum::from_u32(100).unwrap();
+        let msg = BigNum::from_u32(456).unwrap();
         print!("The commit for {} is: ", msg);
         let (c, o) = commiter.commit(msg).unwrap();
         println!("{:#?}", c);

@@ -1,8 +1,8 @@
-use crate::group::{DLogGroup, MultGroup};
+use crate::group::{DLogGroup, MultiplicativeGroup};
 use openssl::bn::BigNum;
 use openssl::error::ErrorStack;
 
-pub type Committer = super::Committer<BigNum, MultGroup>;
+pub type Committer = super::Committer<BigNum, MultiplicativeGroup>;
 pub type Commit = super::Commit<BigNum>;
 
 impl Committer {
@@ -31,7 +31,7 @@ impl Committer {
     /// ```
     #[allow(dead_code)]
     pub fn new(secpar: i32) -> Result<Committer, ErrorStack> {
-        let group = MultGroup::new(secpar)?;
+        let group = MultiplicativeGroup::new(secpar)?;
         let h = group.generate_random();
         Ok(Self { group, h })
     }
