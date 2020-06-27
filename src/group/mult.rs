@@ -24,15 +24,15 @@ impl MultiplicativeGroup {
     pub fn new(secpar: i32) -> Result<Self, ErrorStack> {
         // create context to manage the bignum
         let mut ctx = BigNumContext::new()?;
+
         // generate prime safe number p = 2q + 1
         let mut p = BigNum::new()?;
         p.generate_prime(secpar, true, None, None)?;
 
-        let mut p_minus_one = BigNum::new()?;
-        p_minus_one.checked_sub(&p, &BigNum::from_u32(1).unwrap())?;
-        let mut q = BigNum::new()?;
-        q.checked_div(&p_minus_one, &BigNum::from_u32(2).unwrap(), &mut ctx)?;
+        //compute order q
+        let q = compute_order(&p, &mut ctx)?;
 
+        // Rabin Test (not really mandatory, since we use a safe prime)
         dbg!(q.is_prime(64, &mut ctx).unwrap());
         dbg!(p.is_prime(64, &mut ctx).unwrap());
 
@@ -42,6 +42,14 @@ impl MultiplicativeGroup {
         g.mod_exp(&_g, &BigNum::from_u32(2).unwrap(), &p, &mut ctx)?;
         Ok(Self { ctx, g, q, p })
     }
+}
+
+fn compute_order(p: &BigNum, ctx: &mut BigNumContext) -> Result<BigNum, ErrorStack> {
+    let mut p_minus_one = BigNum::new()?;
+    p_minus_one.checked_sub(p, &BigNum::from_u32(1).unwrap())?;
+    let mut q = BigNum::new()?;
+    q.checked_div(&p_minus_one, &BigNum::from_u32(2).unwrap(), ctx)?;
+    Ok(q)
 }
 
 impl super::Element for BigNum {}
