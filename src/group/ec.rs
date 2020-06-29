@@ -28,7 +28,7 @@ impl EllipticCurveGroup {
     ///
     /// * `secpar`: Length of the security parameter in bits.
     /// * `nid`: The numerical identifier for the curve. These curves can be
-    /// discovered using using openssl binary `openssl ecparam -list_curves`.
+    /// discovered using using `openssl ecparam -list_curves` command.
     ///
     /// # Examples
     ///
@@ -61,6 +61,7 @@ impl fmt::Debug for EllipticCurveGroup {
 }
 
 impl super::DLogGroup<EcPoint> for EllipticCurveGroup {
+    /// Caution: this method `panics!`
     fn get_generator(&self) -> &EcPoint {
         todo!()
     }
@@ -89,6 +90,7 @@ impl super::DLogGroup<EcPoint> for EllipticCurveGroup {
     }
 
     /// Despite its name, this method performs a multiplication on the curve.
+    /// Indeed it returns an `Ecpoint x = e1 * e2`.
     fn exponentiate(&mut self, e1: &EcPoint, e2: &BigNum) -> EcPoint {
         let mut ret = EcPoint::new(&self.group).unwrap();
         ret.mul(&self.group, e1, e2, &mut self.ctx).unwrap();
@@ -96,13 +98,15 @@ impl super::DLogGroup<EcPoint> for EllipticCurveGroup {
     }
 
     // Despite its name, this method performs the sum.
+    /// Indeed it returns an `Ecpoint x = e1 + e2`.
     fn multiply(&mut self, e1: &EcPoint, e2: &EcPoint) -> EcPoint {
         let mut ret = EcPoint::new(&self.group).unwrap();
         ret.add(&self.group, e1, e2, &mut self.ctx).unwrap();
         ret
     }
 
-    // Despite its name, this method performs a multiplication for generator.
+    /// Despite its name, this method performs a multiplication for the
+    /// group generator `g`. Indeed it returns an `Ecpoint x = g ^ pow`
     fn pow(&mut self, pow: &BigNum) -> EcPoint {
         let mut ret = EcPoint::new(&self.group).unwrap();
         ret.mul_generator(&self.group, pow, &mut self.ctx).unwrap();
