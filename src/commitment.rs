@@ -1,3 +1,5 @@
+//! A simple commitment scheme implementation.
+
 use openssl::bn::BigNum;
 use openssl::error::ErrorStack;
 
@@ -19,6 +21,8 @@ pub trait Opening {}
 
 impl Message for BigNum {}
 
+/// The main trait Committer offers the possibility to commit and verify over
+/// generic structs.
 pub trait Committer<C: Commit, O: Opening> {
     fn commit(&mut self, msg: BigNum) -> Result<(C, O), ErrorStack>;
     fn verify(&mut self, c: C, o: O) -> Result<bool, ErrorStack>;

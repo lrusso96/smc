@@ -1,10 +1,13 @@
-use openssl::bn::BigNum;
+//! A simple wrapper for groups where Discrete Log problem is considered to be
+//! hard.
 
 mod ec;
 mod mult;
 
 pub use ec::EllipticCurveGroup;
 pub use mult::MultiplicativeGroup;
+
+use openssl::bn::BigNum;
 
 /// This is the trait for groups where Discrete Log (**DL**) problem is
 /// considered to be hard.

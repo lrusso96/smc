@@ -1,3 +1,6 @@
+//!Utilities for secure random number generation. This is a simple wrapper of
+//! OpenSSL rand module.
+
 use openssl::bn::{BigNum, MsbOption};
 use openssl::error::ErrorStack;
 
