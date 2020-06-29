@@ -1,11 +1,15 @@
 use crate::group::{DLogGroup, Element};
+use openssl::bn::BigNum;
 use openssl::error::ErrorStack;
 use std::fmt::Debug;
 
+pub mod ec;
 pub mod mult;
 
 pub type CommitterMult = mult::Committer;
+pub type CommitterEc = ec::Committer;
 pub type CommitMult = mult::Commit;
+pub type CommitEc = ec::Commit;
 
 /// A Pedersen Committer is represented here.
 ///
@@ -17,19 +21,20 @@ pub struct Committer<E: Element, G: DLogGroup<E>> {
 }
 
 pub type Commit<E> = E;
+
 #[derive(Debug)]
-pub struct Opening<E: Element> {
-    msg: E,
-    r: E,
+pub struct Opening {
+    msg: BigNum,
+    r: BigNum,
 }
 
-impl<E: Element> super::Opening for Opening<E> {}
+impl super::Opening for Opening {}
 
 impl<E: Element> super::Commit for Commit<E> {}
 
-impl<E, G> super::Committer<E, Commit<E>, Opening<E>> for Committer<E, G>
+impl<E, G> super::Committer<Commit<E>, Opening> for Committer<E, G>
 where
-    E: Element + super::Message,
+    E: Element,
     G: DLogGroup<E>,
 {
     /// Generates a commit c = g^r * h^m, for a given message m.
@@ -37,9 +42,9 @@ where
     /// # Parameters
     ///
     /// * `msg`: The message.
-    fn commit(&mut self, msg: E) -> Result<(Commit<E>, Opening<E>), ErrorStack> {
+    fn commit(&mut self, msg: BigNum) -> Result<(Commit<E>, Opening), ErrorStack> {
         //x1 = g^r mod q
-        let r = self.group.generate_random();
+        let r = self.group.generate_random_exponent();
         let x1 = self.group.pow(&r);
         //x2 = h^m mod q
         let x2 = self.group.exponentiate(&self.h, &msg);
@@ -48,13 +53,13 @@ where
         Ok((c, o))
     }
 
-    fn verify(&mut self, c: Commit<E>, o: Opening<E>) -> Result<bool, ErrorStack> {
+    fn verify(&mut self, c: Commit<E>, o: Opening) -> Result<bool, ErrorStack> {
         //x1 = g^r mod q
         let r = o.r;
         let x1 = self.group.pow(&r);
         //x2 = h^m mod q
         let x2 = self.group.exponentiate(&self.h, &o.msg);
         let cmt = self.group.multiply(&x1, &x2);
-        Ok(cmt == c)
+        Ok(self.group.eq(&cmt, &c))
     }
 }
