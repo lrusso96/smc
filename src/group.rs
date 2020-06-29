@@ -1,7 +1,9 @@
 use openssl::bn::BigNum;
 
+mod ec;
 mod mult;
 
+pub use ec::EllipticCurveGroup;
 pub use mult::MultiplicativeGroup;
 
 /// This is the trait for groups where Discrete Log (**DL**) problem is
@@ -18,20 +20,26 @@ pub trait DLogGroup<E: Element> {
     fn get_generator(&self) -> &E;
 
     /// Returns the order of the group.
-    fn get_order(&self) -> BigNum;
+    fn get_order(&mut self) -> BigNum;
 
     /// Generates a random element in the group.
-    fn generate_random(&self) -> E;
+    fn generate_random_element(&self) -> E;
+
+    /// Generates a random exponent
+    fn generate_random_exponent(&self) -> BigNum;
 
     /// Computes an exponentiation between two elements in the group.
-    fn exponentiate(&mut self, e1: &E, e2: &E) -> E;
+    fn exponentiate(&mut self, e1: &E, e2: &BigNum) -> E;
 
     /// Computes the multiplication between two elements in the group.
     fn multiply(&mut self, e1: &E, e2: &E) -> E;
 
     /// Computes the pow.
-    fn pow(&mut self, pow: &E) -> E;
+    fn pow(&mut self, pow: &BigNum) -> E;
+
+    /// Compares two elements in a group.
+    fn eq(&mut self, e1: &E, e2: &E) -> bool;
 }
 
 /// This trait represents an element of a group.
-pub trait Element: PartialEq {}
+pub trait Element {}
