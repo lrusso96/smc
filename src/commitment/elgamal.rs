@@ -1,11 +1,15 @@
 use crate::group::{DLogGroup, Element};
+use openssl::bn::BigNum;
 use openssl::error::ErrorStack;
 use std::fmt::Debug;
 
+pub mod ec;
 pub mod mult;
 
 pub type CommitterMult = mult::Committer;
 pub type CommitMult = mult::Commit;
+pub type CommitterEc = ec::Committer;
+pub type CommitEc = ec::Commit;
 
 #[derive(Debug)]
 /// El-Gamal Committer is represented here
@@ -23,26 +27,26 @@ pub struct Commit<E: Element> {
 impl<E: Element> super::Commit for Commit<E> {}
 
 #[derive(Debug)]
-pub struct Opening<E: Element> {
-    msg: E,
-    r: E,
+pub struct Opening {
+    msg: BigNum,
+    r: BigNum,
 }
 
-impl<E: Element> super::Opening for Opening<E> {}
+impl super::Opening for Opening {}
 
-impl<E, G> super::Committer<E, Commit<E>, Opening<E>> for Committer<E, G>
+impl<E, G> super::Committer<Commit<E>, Opening> for Committer<E, G>
 where
-    E: Element + super::Message,
+    E: Element,
     G: DLogGroup<E>,
 {
     /// Computes the commit as a tuple (c1, c2), where c1 = g^r and c2 = h^r *
     /// g^m
-    fn commit(&mut self, msg: E) -> Result<(Commit<E>, Opening<E>), ErrorStack> {
+    fn commit(&mut self, msg: BigNum) -> Result<(Commit<E>, Opening), ErrorStack> {
         //c1 = g^r mod q
-        let r = self.group.generate_random();
+        let r = self.group.generate_random_exponent();
         let c1 = self.group.pow(&r);
         //c2 = h^r * g^m mod q
-        let x1 = self.group.multiply(&self.h, &r);
+        let x1 = self.group.exponentiate(&self.h, &r);
         let x2 = self.group.pow(&msg);
         let c2 = self.group.multiply(&x1, &x2);
         let c = Commit { c1, c2 };
@@ -50,15 +54,17 @@ where
         Ok((c, o))
     }
 
-    fn verify(&mut self, c: Commit<E>, o: Opening<E>) -> Result<bool, ErrorStack> {
+    fn verify(&mut self, c: Commit<E>, o: Opening) -> Result<bool, ErrorStack> {
         //c1 = g^r mod q
         let r = o.r;
         let c1 = self.group.pow(&r);
 
         //c2 = h^r * g^m mod q
-        let x1 = self.group.multiply(&self.h, &r);
+        let x1 = self.group.exponentiate(&self.h, &r);
         let x2 = self.group.pow(&o.msg);
         let c2 = self.group.multiply(&x1, &x2);
-        Ok(c1 == c.c1 && c2 == c.c2)
+        let b1 = self.group.eq(&c1, &c.c1);
+        let b2 = self.group.eq(&c2, &c.c2);
+        Ok(b1 && b2)
     }
 }
