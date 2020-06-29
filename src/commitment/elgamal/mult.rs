@@ -17,17 +17,16 @@ impl Committer {
     ///```
     ///use smc::commitment::{Committer, ElGamalCommitterMult};
     ///use openssl::bn::BigNum;
-    ///fn main() {
-    ///    println!("Hello, let's try this El-Gamal commit!");
-    ///    let sec = 32;
-    ///    println!("I'm gonna use {} bits security", sec);
-    ///    let mut commiter = ElGamalCommitterMult::new(sec).unwrap();
-    ///    println!("{:#?}", commiter);
-    ///    let msg = BigNum::from_u32(100).unwrap();
-    ///    print!("The commit for {} is: ", msg);
-    ///    let (c, _) = commiter.commit(msg).unwrap();
-    ///    println!("{:#?}", c);
-    ///}
+    ///
+    ///println!("Hello, let's try this El-Gamal commit!");
+    ///let sec = 32;
+    ///println!("I'm gonna use {} bits security", sec);
+    ///let mut commiter = ElGamalCommitterMult::new(sec).unwrap();
+    ///println!("{:#?}", commiter);
+    ///let msg = BigNum::from_u32(100).unwrap();
+    ///print!("The commit for {} is: ", msg);
+    ///let (c, _) = commiter.commit(msg).unwrap();
+    ///println!("{:#?}", c);
     /// ```
     #[allow(dead_code)]
     pub fn new(secpar: i32) -> Result<Committer, ErrorStack> {
