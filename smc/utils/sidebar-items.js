@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["rand","Generates a random `BigNum` with `secpar` bits."],["rand_range","Generates a random `BigNum` between 1 and `limit` - 1."]]});

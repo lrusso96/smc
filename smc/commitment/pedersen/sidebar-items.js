@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["ec",""],["mult",""]],"struct":[["Committer","A Pedersen Committer is represented here."],["Opening",""]],"type":[["Commit",""],["CommitEc",""],["CommitMult",""],["CommitterEc",""],["CommitterMult",""]]});

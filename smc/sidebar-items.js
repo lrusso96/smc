@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["commitment","A simple commitment scheme implementation."],["group","A simple wrapper for groups where Discrete Log problem is considered to be hard."],["utils","Utilities for secure random number generation. This is a simple wrapper of OpenSSL rand module."]]});
