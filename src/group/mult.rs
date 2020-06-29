@@ -1,4 +1,4 @@
-use crate::utils::gen_random;
+use crate::utils::rand_range;
 use openssl::bn::{BigNum, BigNumContext};
 use openssl::error::ErrorStack;
 use std::fmt;
@@ -37,7 +37,7 @@ impl MultiplicativeGroup {
         dbg!(p.is_prime(64, &mut ctx).unwrap());
 
         // generate random g (generator)
-        let _g = gen_random(&p)?;
+        let _g = rand_range(&p)?;
         let mut g = BigNum::new()?;
         g.mod_exp(&_g, &BigNum::from_u32(2).unwrap(), &p, &mut ctx)?;
         Ok(Self { ctx, g, q, p })
@@ -69,12 +69,16 @@ impl super::DLogGroup<BigNum> for MultiplicativeGroup {
     }
 
     /// returns a copy!
-    fn get_order(&self) -> BigNum {
+    fn get_order(&mut self) -> BigNum {
         self.q.to_owned().unwrap()
     }
 
-    fn generate_random(&self) -> BigNum {
-        gen_random(&self.q).unwrap()
+    fn generate_random_element(&self) -> BigNum {
+        self.generate_random_exponent()
+    }
+
+    fn generate_random_exponent(&self) -> BigNum {
+        rand_range(&self.q).unwrap()
     }
 
     fn exponentiate(&mut self, e1: &BigNum, e2: &BigNum) -> BigNum {
@@ -92,5 +96,9 @@ impl super::DLogGroup<BigNum> for MultiplicativeGroup {
     fn pow(&mut self, pow: &BigNum) -> BigNum {
         let g = self.g.to_owned().unwrap();
         self.exponentiate(&g, &pow)
+    }
+
+    fn eq(&mut self, e1: &BigNum, e2: &BigNum) -> bool {
+        e1 == e2
     }
 }
