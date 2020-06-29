@@ -68,12 +68,13 @@ impl super::DLogGroup<BigNum> for MultiplicativeGroup {
         &self.g
     }
 
-    fn get_order(&self) -> &BigNum {
-        &self.q
+    /// returns a copy!
+    fn get_order(&self) -> BigNum {
+        self.q.to_owned().unwrap()
     }
 
     fn generate_random(&self) -> BigNum {
-        gen_random(&self.get_order()).unwrap()
+        gen_random(&self.q).unwrap()
     }
 
     fn exponentiate(&mut self, e1: &BigNum, e2: &BigNum) -> BigNum {
@@ -89,9 +90,7 @@ impl super::DLogGroup<BigNum> for MultiplicativeGroup {
     }
 
     fn pow(&mut self, pow: &BigNum) -> BigNum {
-        let g1 = BigNum::from_u32(0).unwrap();
-        let mut g2 = BigNum::new().unwrap();
-        g2.checked_add(&g1, &self.get_generator()).unwrap();
-        self.exponentiate(&g2, &pow)
+        let g = self.g.to_owned().unwrap();
+        self.exponentiate(&g, &pow)
     }
 }
