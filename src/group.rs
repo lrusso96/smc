@@ -1,3 +1,5 @@
+use openssl::bn::BigNum;
+
 mod mult;
 
 pub use mult::MultiplicativeGroup;
@@ -16,7 +18,7 @@ pub trait DLogGroup<E: Element> {
     fn get_generator(&self) -> &E;
 
     /// Returns the order of the group.
-    fn get_order(&self) -> &E;
+    fn get_order(&self) -> BigNum;
 
     /// Generates a random element in the group.
     fn generate_random(&self) -> E;
