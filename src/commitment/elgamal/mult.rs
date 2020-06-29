@@ -32,7 +32,7 @@ impl Committer {
     #[allow(dead_code)]
     pub fn new(secpar: i32) -> Result<Committer, ErrorStack> {
         let group = MultiplicativeGroup::new(secpar)?;
-        let h = group.generate_random();
+        let h = group.generate_random_element();
         Ok(Self { group, h })
     }
 }
